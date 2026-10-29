@@ -1,8 +1,14 @@
 package com.example.practicalfive;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -19,6 +25,7 @@ public class Municipality extends AppCompatActivity {
         TextView textName = findViewById(R.id.textMunicipalityName);
         ImageView imageMunicipality = findViewById(R.id.imageMunicipality);
         TextView textInformation = findViewById(R.id.textInformation);
+        Button buttonVisitSite = findViewById(R.id.buttonVisitSite);
 
         // Retrieve and re-validate the name passed from MainActivity.
         String rawName = getIntent().getStringExtra(MainActivity.EXTRA_MUNICIPALITY);
@@ -65,6 +72,46 @@ public class Municipality extends AppCompatActivity {
         String summary = findSummary(summaries);
         textInformation.setText(summary);
         textInformation.setTextColor(colour);
+
+        // Visit site button tinted with the municipality colour.
+        buttonVisitSite.setBackgroundColor(colour);
+
+        buttonVisitSite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openWebsite();
+            }
+        });
+    }
+
+    /**
+     * Opens the official website of the displayed municipality using an
+     * implicit Intent so that Android chooses a suitable application.
+     */
+    private void openWebsite() {
+        String url;
+        switch (name) {
+            case "Shanghai":
+                url = "https://english.shanghai.gov.cn/";
+                break;
+            case "Tianjin":
+                url = "https://en.tj.gov.cn/";
+                break;
+            case "Chongqing":
+                url = "https://english.cq.gov.cn/";
+                break;
+            case "Beijing":
+            default:
+                url = "https://english.beijing.gov.cn/";
+                break;
+        }
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.no_browser, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
